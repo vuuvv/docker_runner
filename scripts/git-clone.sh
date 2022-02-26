@@ -56,7 +56,8 @@ cleandir() {
 
 step() {
   STEP_DATA=$(printf '{"taskId": "%s", "step":"%s"}' "${APP_ID}" "$1")
-  curl --no-progress-meter -X POST "http://${RUNNER_IP}:3000/docker/step" -H 'Content-Type: application/json' -d "${STEP_DATA}"
+  RESP=$(curl --no-progress-meter -X POST "http://${RUNNER_IP}:3000/docker/step" -H 'Content-Type: application/json' -d "${STEP_DATA}")
+  echo "${RESP}"
 }
 
 step "Create checkout directory"
@@ -86,7 +87,6 @@ COMMIT_ID=$(git show -q --pretty=format:%H FETCH_HEAD)
 
 git checkout -f ${COMMIT_ID}
 
-
 step "Build image"
 IMAGE="${IMAGE_URL}:${IMAGE_TAG}"
 #echo "Build image: ${IMAGE}"
@@ -100,7 +100,8 @@ docker image prune -f
 
 step "Notify success"
 #echo "Notify success"
-curl --no-progress-meter -X POST "http://${RUNNER_IP}:3000/docker/complete?id=${APP_ID}"
+RESP=$(curl --no-progress-meter -X POST "http://${RUNNER_IP}:3000/docker/complete?id=${APP_ID}")
+echo ${RESP}
 
 echo "Success"
 

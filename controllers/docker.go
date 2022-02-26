@@ -7,6 +7,7 @@ import (
 	"github.com/vuuvv/docker-runner/services/tasks"
 	"github.com/vuuvv/docker-runner/utils"
 	"github.com/vuuvv/errors"
+	"github.com/vuuvv/orca/request"
 	"github.com/vuuvv/orca/server"
 )
 
@@ -33,6 +34,8 @@ func (this *dockerController) Mount(router *gin.RouterGroup) {
 	this.Post("ci", this.ci)
 	this.Post("step", this.step)
 	this.Post("complete", this.complete)
+	this.Get("task", this.getTask)
+	this.Delete("task", this.deleteTask)
 	this.Get("tasks", this.tasks)
 	this.Get("task_map", this.taskMap)
 	this.Get("log", this.log)
@@ -73,13 +76,41 @@ func (this *dockerController) log(ctx *gin.Context) {
 	this.SendW(services.DockerService.GetLogsByTaskId(id))
 }
 
+func (this *dockerController) getTask(ctx *gin.Context) {
+	id, ok := ctx.GetQuery("id")
+	if !ok {
+		this.SendError(errors.New("请传入task id"))
+		return
+	}
+	task, ok := tasks.GetTask(id)
+	if !ok {
+		this.SendError(errors.Errorf("任务不存在：%s", id))
+		return
+	}
+	this.Send(task)
+}
+
+func (this *dockerController) deleteTask(ctx *gin.Context) {
+	id, ok := ctx.GetQuery("id")
+	if !ok {
+		this.SendError(errors.New("请传入task id"))
+		return
+	}
+	this.SendW(tasks.DeleteTask(id))
+}
+
 func (this *dockerController) complete(ctx *gin.Context) {
 	id, ok := ctx.GetQuery("id")
 	if !ok {
 		this.SendError(errors.New("请传入task id"))
 		return
 	}
-	this.SendW(services.DockerService.Complete(id))
+	_, err := services.DockerService.Complete(id)
+	if err != nil {
+		this.SendError(err)
+		return
+	}
+	this.Send("Task completed")
 }
 
 func (this *dockerController) step(ctx *gin.Context) {
@@ -92,7 +123,7 @@ func (this *dockerController) step(ctx *gin.Context) {
 
 	task, ok := tasks.GetTask(form.TaskId)
 	if !ok {
-		this.SendError(server.ErrorBadRequest("任务不存在: %s", form.TaskId))
+		this.SendError(request.ErrorBadRequest("任务不存在: %s", form.TaskId))
 		return
 	}
 	task.SetStep(form.Step)

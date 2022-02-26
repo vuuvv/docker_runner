@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/vuuvv/docker-runner/utils"
+	"github.com/vuuvv/errors"
 	"sync"
 	"time"
 )
@@ -14,29 +15,55 @@ const (
 
 var taskMap sync.Map
 
+type ContainerInfo struct {
+	Id    string
+	State ContainerState
+}
+
+type ContainerState struct {
+	Status   string
+	Running  bool
+	ExitCode int
+}
+
 type Task struct {
-	Id        string      `json:"id"`
-	Type      string      `json:"type"`
-	Input     string      `json:"input"`
-	Output    string      `json:"output"`
-	Status    string      `json:"status"`
-	Log       string      `json:"log"`
-	Error     error       `json:"error"`
-	Step      string      `json:"step"`
-	Result    string      `json:"result"`
-	CreatedAt *time.Time  `json:"createdAt"`
-	EndAt     *time.Time  `json:"endAt"`
-	Data      interface{} `json:"data"`
+	Id            string         `json:"id"`
+	Type          string         `json:"type"`
+	Input         string         `json:"input"`
+	Output        string         `json:"output"`
+	Status        string         `json:"status"`
+	Log           string         `json:"log"`
+	CleanLog      string         `json:"cleanLog"`
+	Error         error          `json:"error"`
+	RelateError   error          `json:"relateError"`
+	Step          string         `json:"step"`
+	Result        string         `json:"result"`
+	CreatedAt     *time.Time     `json:"createdAt"`
+	EndAt         *time.Time     `json:"endAt"`
+	Data          interface{}    `json:"data"`
+	ContainerInfo *ContainerInfo `json:"containerInfo"`
+	IsClean       bool           `json:"isClean"`
+	NotifyAt      *time.Time     `json:"notifyAt"`
+	NotifyCount   int            `json:"notifyCount"`
+}
+
+func (this *Task) IsContainerExited() bool {
+	if this.ContainerInfo == nil {
+		return false
+	}
+	return !this.ContainerInfo.State.Running
 }
 
 func (this *Task) Complete(err error) *Task {
+	now := time.Now()
 	this.Error = err
 	this.Status = TaskStatusCompleted
-	this.Step = TaskStatusCompleted
+	this.EndAt = &now
 	if this.Error != nil {
 		this.Result = err.Error()
 	} else {
 		this.Result = TaskStatusCompleted
+		this.Step = TaskStatusCompleted
 	}
 	return this
 }
@@ -105,6 +132,15 @@ func GetTask(id string) (task *Task, ok bool) {
 		return obj.(*Task), true
 	}
 	return nil, false
+}
+
+func DeleteTask(id string) (task *Task, err error) {
+	task, ok := GetTask(id)
+	if !ok {
+		return nil, errors.Errorf("任务不存在：%s", id)
+	}
+	taskMap.Delete(id)
+	return task, nil
 }
 
 func GetTaskMap() (tasks map[string]*Task) {
