@@ -4,7 +4,7 @@ set -ex
 git config --global init.defaultBranch master
 git config --global advice.detachedHead false
 
-if [ -z ${APP_ID}]; then
+if test -z ${APP_ID}; then
   echo 'ERROR: environment "APP_ID" not set!'
   exit 1
 fi
@@ -94,6 +94,12 @@ docker build -f ${DOCKER_FILE} -t ${IMAGE} .
 
 #echo "Push image: ${IMAGE}"
 docker push ${IMAGE}
+
+if [ ${IMAGE_TAG} != "latest" ]; then
+  LATEST_IMAGE="${IMAGE_URL}:latest"
+  docker tag ${IMAGE} ${LATEST_IMAGE}
+  docker push ${LATEST_IMAGE}
+fi
 
 #echo "Clean image"
 docker image prune -f

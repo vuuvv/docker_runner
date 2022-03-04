@@ -33,11 +33,14 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 		form.ImageTag = time.Now().In(loc).Format("2006-01-02_15-04-05")
 	}
 
+	cloneForm := *form
+	cloneForm.DockerSecret = ""
+	cloneForm.GitSecret = ""
 	task = tasks.NewTask(
 		tasks.WithType(typ),
 		tasks.WithInput(form.GitRepository()),
 		tasks.WithOutput(form.ImageRepository()),
-		tasks.WithData(form),
+		tasks.WithData(cloneForm),
 	)
 
 	ip, err := utils.ExternalIP()
@@ -169,7 +172,7 @@ func (this *dockerService) FetchContainerInfo(taskList ...*tasks.Task) {
 		if err != nil {
 			task.ContainerInfo = nil
 			task.RelateError = err
-			zap.L().Error(err.Error(), zap.Error(err))
+			zap.L().Error(err.Error(), zap.Error(err), zap.String("cmd", "docker inspect " + task.Id))
 			continue
 		}
 
