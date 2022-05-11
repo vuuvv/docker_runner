@@ -36,8 +36,8 @@ if test -z ${BUILD_DIRECTORY}; then
   BUILD_DIRECTORY="."
 fi
 
-if test -z ${DOCKER_FILE}; then
-  DOCKER_FILE="Dockerfile"
+if test -z ${DOCKERFILE}; then
+  DOCKERFILE="Dockerfile"
 fi
 
 
@@ -95,7 +95,7 @@ step "Build image"
 cd ${BUILD_DIRECTORY}
 IMAGE="${IMAGE_URL}:${IMAGE_TAG}"
 #echo "Build image: ${IMAGE}"
-docker build -f ${DOCKER_FILE} -t ${IMAGE} .
+docker build -f ${DOCKERFILE} -t ${IMAGE} .
 
 #echo "Push image: ${IMAGE}"
 docker push ${IMAGE}
