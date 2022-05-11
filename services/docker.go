@@ -84,6 +84,8 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 		"-e", fmt.Sprintf("GIT_REVISION=%s", form.GitRevision),
 		"-e", fmt.Sprintf("IMAGE_URL=%s", form.ImageUrl),
 		"-e", fmt.Sprintf("IMAGE_TAG=%s", form.ImageTag),
+		"-e", fmt.Sprintf("BUILD_DIRECTORY=%s", form.BuildDirectory),
+		"-e", fmt.Sprintf("DOCKERFILE=%s", form.Dockerfile),
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"-v", "/workspace:/workspace",
 		"-v", "/workspace/.docker/config.json:/root/.docker/config.json",

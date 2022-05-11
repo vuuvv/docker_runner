@@ -32,8 +32,8 @@ if test -z ${WORKSPACE}; then
   WORKSPACE="/workspace"
 fi
 
-if test -z ${WORK_DIRECTORY}; then
-  WORK_DIRECTORY="."
+if test -z ${BUILD_DIRECTORY}; then
+  BUILD_DIRECTORY="."
 fi
 
 if test -z ${DOCKER_FILE}; then
@@ -92,7 +92,7 @@ COMMIT_ID=$(git show -q --pretty=format:%H FETCH_HEAD)
 git checkout -f ${COMMIT_ID}
 
 step "Build image"
-cd ${WORK_DIRECTORY}
+cd ${BUILD_DIRECTORY}
 IMAGE="${IMAGE_URL}:${IMAGE_TAG}"
 #echo "Build image: ${IMAGE}"
 docker build -f ${DOCKER_FILE} -t ${IMAGE} .
