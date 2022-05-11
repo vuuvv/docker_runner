@@ -1,4 +1,9 @@
-FROM golang:1.17-alpine
+FROM golang:1.18.1
+
+# 环境变量设置，使用私有仓库
+RUN go env -w GOPRIVATE=vuuvv.cn
+RUN git config --global url."git@vuuvv.cn:".insteadof "https://vuuvv.cn/"
+RUN go env -w GOINSECURE=vuuvv.cn
 
 # 启用go module
 ENV GO111MODULE=on \

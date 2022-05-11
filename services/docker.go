@@ -9,13 +9,13 @@ import (
 	"github.com/vuuvv/docker-runner/services/tasks"
 	"github.com/vuuvv/docker-runner/utils"
 	"github.com/vuuvv/errors"
-	"github.com/vuuvv/orca"
-	"github.com/vuuvv/orca/serialize"
-	orcaUtils "github.com/vuuvv/orca/utils"
 	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"time"
+	"vuuvv.cn/unisoftcn/orca"
+	"vuuvv.cn/unisoftcn/orca/serialize"
+	orcaUtils "vuuvv.cn/unisoftcn/orca/utils"
 )
 
 type dockerService struct {
@@ -172,12 +172,11 @@ func (this *dockerService) FetchContainerInfo(taskList ...*tasks.Task) {
 		if err != nil {
 			task.ContainerInfo = nil
 			task.RelateError = err
-			zap.L().Error(err.Error(), zap.Error(err), zap.String("cmd", "docker inspect " + task.Id))
+			zap.L().Error(err.Error(), zap.Error(err), zap.String("cmd", "docker inspect "+task.Id))
 			continue
 		}
 
-		var infoList []*tasks.ContainerInfo
-		err = serialize.JsonParse(output, &infoList)
+		infoList, err := serialize.JsonParsePrimitive[[]*tasks.ContainerInfo](output)
 		if err != nil {
 			task.ContainerInfo = nil
 			task.RelateError = err

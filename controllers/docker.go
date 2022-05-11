@@ -7,8 +7,8 @@ import (
 	"github.com/vuuvv/docker-runner/services/tasks"
 	"github.com/vuuvv/docker-runner/utils"
 	"github.com/vuuvv/errors"
-	"github.com/vuuvv/orca/request"
-	"github.com/vuuvv/orca/server"
+	"vuuvv.cn/unisoftcn/orca/base"
+	"vuuvv.cn/unisoftcn/orca/server"
 )
 
 type dockerController struct {
@@ -123,7 +123,7 @@ func (this *dockerController) step(ctx *gin.Context) {
 
 	task, ok := tasks.GetTask(form.TaskId)
 	if !ok {
-		this.SendError(request.ErrorBadRequest("任务不存在: %s", form.TaskId))
+		this.SendError(base.ErrorBadRequest("任务不存在: %s", form.TaskId))
 		return
 	}
 	task.SetStep(form.Step)
