@@ -108,6 +108,7 @@ fi
 
 #echo "Clean image"
 docker image prune -f
+docker image rm -f ${IMAGE}
 
 step "Notify success"
 #echo "Notify success"
