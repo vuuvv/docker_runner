@@ -49,17 +49,23 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 	}
 
 	workspace := fmt.Sprintf("/workspace/%s", task.Id)
+	if err = os.MkdirAll(workspace, os.ModeDir|0755); err != nil {
+		return task.Complete(err)
+	}
 	secretPath := fmt.Sprintf("%s/secrets", workspace)
+	if err = os.MkdirAll(secretPath, os.ModeDir|0755); err != nil {
+		return task.Complete(err)
+	}
 
-	err = utils.MountSecret(fmt.Sprintf("%s/.docker/config.json", secretPath), form.DockerSecret)
+	err = utils.MountSecret(fmt.Sprintf("%s/.docker/config.json", secretPath), form.DockerSecret, 0400)
 	if err != nil {
 		return task.Complete(err)
 	}
-	err = utils.MountSecret(fmt.Sprintf("%s/.kube/config", secretPath), form.KubeConfig)
+	err = utils.MountSecret(fmt.Sprintf("%s/.kube/config", secretPath), form.KubeConfig, 0400)
 	if err != nil {
 		return task.Complete(err)
 	}
-	err = utils.MountSecret(fmt.Sprintf("%s/.ssh/id_rsa", secretPath), form.GitSecret)
+	err = utils.MountSecret(fmt.Sprintf("%s/.ssh/id_rsa", secretPath), form.GitSecret, 0400)
 	if err != nil {
 		return task.Complete(err)
 	}
