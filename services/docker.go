@@ -48,20 +48,23 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 		return task.Complete(err)
 	}
 
-	err = utils.MountSecret("/workspace/.docker/config.json", form.DockerSecret)
+	workspace := fmt.Sprintf("/workspace/%s", task.Id)
+	secretPath := fmt.Sprintf("%s/secrets", workspace)
+
+	err = utils.MountSecret(fmt.Sprintf("%s/.docker/config.json", secretPath), form.DockerSecret)
 	if err != nil {
 		return task.Complete(err)
 	}
-	err = utils.MountSecret("/workspace/.kube/config", form.KubeConfig)
+	err = utils.MountSecret(fmt.Sprintf("%s/.kube/config", secretPath), form.KubeConfig)
 	if err != nil {
 		return task.Complete(err)
 	}
-	err = utils.MountSecret("/workspace/.ssh/id_rsa", form.GitSecret)
+	err = utils.MountSecret(fmt.Sprintf("%s/.ssh/id_rsa", secretPath), form.GitSecret)
 	if err != nil {
 		return task.Complete(err)
 	}
 
-	cmd := exec.Command("cp", "-rf", "/app/scripts", "/workspace")
+	cmd := exec.Command("cp", "-rf", "/app/scripts", workspace)
 
 	if err = cmd.Run(); err != nil {
 		return task.Complete(err)
@@ -87,11 +90,11 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 		"-e", fmt.Sprintf("BUILD_DIRECTORY=%s", form.BuildDirectory),
 		"-e", fmt.Sprintf("DOCKERFILE=%s", form.Dockerfile),
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
-		"-v", "/workspace:/workspace",
-		"-v", "/workspace/.docker/config.json:/root/.docker/config.json",
-		"-v", "/workspace/.kube/config:/root/.kube/config",
-		"-v", "/workspace/.ssh/id_rsa:/root/.ssh/id_rsa",
-		"-v", "/workspace/scripts/ssh_config:/root/.ssh/config",
+		"-v", fmt.Sprintf("%s:/workspace", workspace),
+		"-v", fmt.Sprintf("%s/.docker/config.json:/root/.docker/config.json", secretPath),
+		"-v", fmt.Sprintf("%s/.kube/config:/root/.kube/config", secretPath),
+		"-v", fmt.Sprintf("%s/.ssh/id_rsa:/root/.ssh/id_rsa", secretPath),
+		"-v", fmt.Sprintf("%s/scripts/ssh_config:/root/.ssh/config", workspace),
 		"registry.aliyuncs.com/vuuvv/docker:20.10.8-git", "sh", "/workspace/scripts/git-clone.sh",
 	)
 

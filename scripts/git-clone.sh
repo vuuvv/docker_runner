@@ -29,7 +29,7 @@ if test -z ${GIT_REVISION}; then
 fi
 
 if test -z ${WORKSPACE}; then
-  WORKSPACE="/workspace"
+  WORKSPACE="/workspace/${APP_ID}"
 fi
 
 if test -z ${BUILD_DIRECTORY}; then
@@ -41,7 +41,7 @@ if test -z ${DOCKERFILE}; then
 fi
 
 
-CHECKOUT_DIR="${WORKSPACE}/${APP_ID}"
+CHECKOUT_DIR="${WORKSPACE}/code"
 
 cleandir() {
   # Delete any existing contents of the repo directory if it exists.

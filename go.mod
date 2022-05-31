@@ -7,7 +7,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/vuuvv/errors v0.9.5
 	go.uber.org/zap v1.21.0
-	vuuvv.cn/unisoftcn/orca v0.0.38
+	vuuvv.cn/unisoftcn/orca v0.0.39
 )
 
 require (
@@ -67,7 +67,7 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.3.3 // indirect
-	gorm.io/driver/postgres v1.3.5 // indirect
+	gorm.io/driver/postgres v1.3.6 // indirect
 	gorm.io/gorm v1.23.5 // indirect
 	gorm.io/plugin/soft_delete v1.1.0 // indirect
 )
