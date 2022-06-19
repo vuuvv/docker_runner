@@ -3,6 +3,7 @@ package tasks
 import (
 	"github.com/vuuvv/docker-runner/utils"
 	"github.com/vuuvv/errors"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 )
@@ -60,6 +61,7 @@ func (this *Task) Complete(err error) *Task {
 	this.Status = TaskStatusCompleted
 	this.EndAt = &now
 	if this.Error != nil {
+		zap.L().Error("task error", zap.Error(err))
 		this.Result = err.Error()
 	} else {
 		this.Result = TaskStatusCompleted

@@ -49,11 +49,11 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 	}
 
 	workspace := fmt.Sprintf("/workspace/%s", task.Id)
-	if err = os.MkdirAll(workspace, os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(workspace, 0755); err != nil {
 		return task.Complete(err)
 	}
 	secretPath := fmt.Sprintf("%s/secrets", workspace)
-	if err = os.MkdirAll(secretPath, os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(secretPath, 0755); err != nil {
 		return task.Complete(err)
 	}
 

@@ -25,7 +25,7 @@ func MountSecret(path string, secret string, perm os.FileMode) (err error) {
 
 	dir := filepath.Dir(path)
 	zap.L().Info("MountSecret create directory", zap.String("dir", dir))
-	if err = os.MkdirAll(filepath.Dir(dir), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(filepath.Dir(dir), perm); err != nil {
 		return errors.Errorf("Mount secret [%s] error: %s", path, err.Error())
 	}
 
@@ -35,7 +35,7 @@ func MountSecret(path string, secret string, perm os.FileMode) (err error) {
 	}
 
 	zap.L().Info("MountSecret write file", zap.String("bs", string(bs)))
-	err = ioutil.WriteFile(path, bs, os.ModeDir|perm)
+	err = ioutil.WriteFile(path, bs, perm)
 	if err != nil {
 		return errors.Errorf("Mount secret [%s] error, cannot write to file: %s", path, err.Error())
 	}
