@@ -81,6 +81,7 @@ func (this *dockerService) Build(form *forms.CI) (task *tasks.Task) {
 	task.Run()
 	task.SetStep("Start docker container")
 
+	zap.L().Info("start docker container")
 	cmd = exec.Command(
 		"docker",
 		"run",

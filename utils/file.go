@@ -25,7 +25,7 @@ func MountSecret(path string, secret string, perm os.FileMode) (err error) {
 
 	dir := filepath.Dir(path)
 	zap.L().Info("MountSecret create directory", zap.String("dir", dir))
-	if err = os.MkdirAll(filepath.Dir(dir), os.ModeDir|perm); err != nil {
+	if err = os.MkdirAll(filepath.Dir(dir), os.ModeDir|0755); err != nil {
 		return errors.Errorf("Mount secret [%s] error: %s", path, err.Error())
 	}
 
