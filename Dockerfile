@@ -1,4 +1,4 @@
-FROM registry.aliyuncs.com/vuuvv/orca:0.0.10 as builder
+FROM registry.aliyuncs.com/vuuvv/orca:0.0.11 as builder
 
 # 启用go module
 ENV GO111MODULE=on \
