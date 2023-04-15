@@ -131,6 +131,19 @@ func (this *dockerService) GetLogs(task *tasks.Task) (err error) {
 	return errors.WithStack(err)
 }
 
+// StopContainer 停止容器并清除现场
+func (this *dockerService) StopContainer(task *tasks.Task) (err error) {
+	output, err := utils.RunCommand("docker", "stop", task.Id)
+	if err != nil {
+		task.CleanLog += fmt.Sprintf("\n%s", output)
+	} else {
+		task.CleanLog += "Stop container success"
+	}
+
+	return this.RemoveContainer(task)
+}
+
+// RemoveContainer 正常的清除现场工作
 func (this *dockerService) RemoveContainer(task *tasks.Task) (err error) {
 	output, err := utils.RunCommand("docker", "rm", task.Id)
 	if err != nil {
@@ -143,7 +156,7 @@ func (this *dockerService) RemoveContainer(task *tasks.Task) (err error) {
 	if err != nil {
 		task.CleanLog += fmt.Sprintf("\n%s", output)
 	} else {
-		task.CleanLog += "Remove dangle image success"
+		task.CleanLog += "\nRemove dangle image success"
 	}
 
 	return errors.WithStack(err)

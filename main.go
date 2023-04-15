@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/vuuvv/docker-runner/controllers"
 	"github.com/vuuvv/docker-runner/services"
+	"github.com/vuuvv/kubench/constants"
 	"vuuvv.cn/unisoftcn/orca"
 	"vuuvv.cn/unisoftcn/orca/auth"
 	"vuuvv.cn/unisoftcn/orca/server"
@@ -15,10 +15,10 @@ func main() {
 	services.DockerService.WatchTask()
 
 	authMiddleware := server.MiddlewareJwt(
-		app.GetHttpServer().GetConfig(),
+		constants.GetAuthConfig(),
 		auth.NoAuthorization{},
 	)
-	app.Use(server.MiddlewareId, gin.Logger(), gin.Recovery(), authMiddleware).Mount(
+	app.Default(authMiddleware).Mount(
 		controllers.DockerController,
 	).Start()
 }

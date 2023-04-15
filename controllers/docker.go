@@ -34,6 +34,7 @@ func (this *dockerController) Mount(router *gin.RouterGroup) {
 	this.Post("ci", this.ci)
 	this.Post("step", this.step)
 	this.Post("complete", this.complete)
+	this.Post("stop", this.stop)
 	this.Get("task", this.getTask)
 	this.Delete("task", this.deleteTask)
 	this.Get("tasks", this.tasks)
@@ -105,12 +106,36 @@ func (this *dockerController) complete(ctx *gin.Context) {
 		this.SendError(errors.New("请传入task id"))
 		return
 	}
+	task, ok := tasks.GetTask(id)
+	if !ok {
+		this.SendError(errors.New("任务不存在"))
+		return
+	}
 	_, err := services.DockerService.Complete(id)
 	if err != nil {
 		this.SendError(err)
 		return
 	}
-	this.Send("Task completed")
+	this.Send(task)
+}
+
+func (this *dockerController) stop(ctx *gin.Context) {
+	id, ok := ctx.GetQuery("id")
+	if !ok {
+		this.SendError(errors.New("请传入task id"))
+		return
+	}
+	task, ok := tasks.GetTask(id)
+	if !ok {
+		this.SendError(errors.New("任务不存在"))
+		return
+	}
+	err := services.DockerService.StopContainer(task)
+	if err != nil {
+		this.SendError(err)
+		return
+	}
+	this.Send(task)
 }
 
 func (this *dockerController) step(ctx *gin.Context) {
