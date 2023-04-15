@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/vuuvv/docker-runner/controllers"
 	"github.com/vuuvv/docker-runner/services"
-	"github.com/vuuvv/kubench/constants"
+	"github.com/vuuvv/docker-runner/utils"
 	"vuuvv.cn/unisoftcn/orca"
 	"vuuvv.cn/unisoftcn/orca/auth"
 	"vuuvv.cn/unisoftcn/orca/server"
@@ -15,7 +15,7 @@ func main() {
 	services.DockerService.WatchTask()
 
 	authMiddleware := server.MiddlewareJwt(
-		constants.GetAuthConfig(),
+		utils.GetAuthConfig(),
 		auth.NoAuthorization{},
 	)
 	app.Default(authMiddleware).Mount(
